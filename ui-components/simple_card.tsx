@@ -25,9 +25,11 @@ export default function PokemonSimpleCard({ pokemon }: Props) {
     imageURL = sprites.front_default;
   }
   return (
-    <Card id={`${pokemon.id}`} align="center" size={"sm"}>
+    <Card id={`${pokemon.id}`} align="center">
       <CardHeader>
-        <Heading size={"md"}>{pokemon.name}</Heading>
+        <Heading fontWeight={"medium"} fontSize={"medium"}>
+          {pokemon.name} / {pokemon.id}
+        </Heading>
       </CardHeader>
       <CardBody>
         <Image alt={`image of ${pokemon.name}`} src={imageURL || ""}></Image>

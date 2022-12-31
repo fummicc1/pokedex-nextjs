@@ -2,6 +2,8 @@ import { Pokemon, PokemonPartialInfo } from "../../data/pokemon";
 import useSWR, { Fetcher } from "swr";
 import PokemonSimpleCard from "../../ui-components/simple_card";
 import {
+  Box,
+  Button,
   CircularProgress,
   CircularProgressLabel,
   Flex,
@@ -15,27 +17,53 @@ const filterByName = (pokemons: Pokemon[], name: string): Pokemon[] =>
   pokemons.filter((pokemon) => pokemon.name.includes(name));
 
 export default function PokemonListPage() {
-  const fetcher: Fetcher<Pokemon[], string> = async (endpoint) => {
-    const response = await fetch(endpoint);
-    return await response.json();
-  };
-  const { data, error } = useSWR("/api/pokemons", fetcher);
-  const initialList = data;
+  const [offset, setOffset] = useState(0);
+  const limit = 10;
+  const initialMinimumPokemonCount = 90;
+  const [isSetup, setIsSetup] = useState(true);
+  const [initialList, setInitialList] = useState<Pokemon[]>([]);
   const [searchWord, setSearchWord] = useState("");
-  const [pokemons, setPokemons] = useState(initialList);
+  initialList.sort((a, b) => a.id - b.id);
+  const [pokemons, setPokemons] = useState<Pokemon[]>([]);
+
   useEffect(() => {
     if (searchWord.length === 0) {
       setPokemons(initialList);
-      return;
-    }
-    if (!initialList) {
       return;
     }
     const newPokemonList = filterByName(initialList, searchWord);
     setPokemons(newPokemonList);
   }, [searchWord, initialList]);
 
-  if (!initialList || !pokemons) {
+  useEffect(() => {
+    fetch(`/api/pokemons?limit=${limit}&offset=${offset}`).then((res) =>
+      res.json().then((newPokemons) => {
+        setInitialList((prev) => [...prev, ...newPokemons]);
+      })
+    );
+  }, [offset]);
+
+  useEffect(() => {
+    if (isSetup) {
+      if (offset == initialList.length) {
+        if (offset < initialMinimumPokemonCount) {
+          setOffset(offset + 10);
+        } else {
+          setIsSetup(false);
+        }
+      }
+    }
+  }, [isSetup, offset, initialList]);
+
+  const loadingElement = (size: number, fontSize: number) => (
+    <CircularProgress isIndeterminate size={size} color={"gray"}>
+      <CircularProgressLabel fontSize={fontSize} fontWeight="medium">
+        Loading...
+      </CircularProgressLabel>
+    </CircularProgress>
+  );
+
+  if (initialList.length < initialMinimumPokemonCount) {
     return (
       <Flex
         align={"center"}
@@ -43,11 +71,7 @@ export default function PokemonListPage() {
         height={"100vh"}
         width={"100vw"}
       >
-        <CircularProgress isIndeterminate size={32} color={"gray"}>
-          <CircularProgressLabel fontSize={16} fontWeight="medium">
-            Loading...
-          </CircularProgressLabel>
-        </CircularProgress>
+        {loadingElement(32, 16)}
       </Flex>
     );
   }
@@ -64,7 +88,10 @@ export default function PokemonListPage() {
         placeholder="Search pokemon by name"
         onChange={onChangeSearchWord}
       ></Input>
-      <SimpleGrid minChildWidth={"120px"}>{contents}</SimpleGrid>
+      <SimpleGrid columns={6}>{contents}</SimpleGrid>
+      <Button onClick={() => setOffset(10 + offset)}>
+        Load next pokemons...
+      </Button>
     </Stack>
   );
 }

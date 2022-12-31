@@ -4,14 +4,17 @@ import { pokeAPIBaseURL } from "../../domain/const";
 
 interface ResponseData {
   results: PokemonPartialInfo[];
+  next: string;
 }
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Pokemon[]>
 ) {
-  const limit = 50;
-  const endpoint = `${pokeAPIBaseURL}/pokemon?limit=${limit}`;
+  const { offset, limit } = req.query;
+  let endpoint = `${pokeAPIBaseURL}/pokemon?limit=${limit || "10"}&offset=${
+    offset || "0"
+  }`;
   const response = await fetch(endpoint);
   const data: ResponseData = await response.json();
   const urls = data.results.map((result) => result.url);
@@ -21,9 +24,3 @@ export default async function handler(
   const results = await Promise.all(pokemons);
   res.status(200).json(results);
 }
-
-export const config = {
-  api: {
-    responseLimit: false,
-  },
-};
