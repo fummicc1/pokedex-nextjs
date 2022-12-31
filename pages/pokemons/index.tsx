@@ -1,7 +1,14 @@
 import { Pokemon, PokemonPartialInfo } from "../../data/pokemon";
 import useSWR, { Fetcher } from "swr";
 import PokemonSimpleCard from "../../ui-components/simple_card";
-import { Input, SimpleGrid, Stack } from "@chakra-ui/react";
+import {
+  CircularProgress,
+  CircularProgressLabel,
+  Flex,
+  Input,
+  SimpleGrid,
+  Stack,
+} from "@chakra-ui/react";
 import { useState, ChangeEventHandler, useEffect } from "react";
 
 const filterByName = (pokemons: Pokemon[], name: string): Pokemon[] =>
@@ -12,7 +19,8 @@ export default function PokemonListPage() {
     const response = await fetch(endpoint);
     return await response.json();
   };
-  const initialList = useSWR("/api/pokemons", fetcher).data || [];
+  const { data, error } = useSWR("/api/pokemons", fetcher);
+  const initialList = data;
   const [searchWord, setSearchWord] = useState("");
   const [pokemons, setPokemons] = useState(initialList);
   useEffect(() => {
@@ -20,9 +28,29 @@ export default function PokemonListPage() {
       setPokemons(initialList);
       return;
     }
+    if (!initialList) {
+      return;
+    }
     const newPokemonList = filterByName(initialList, searchWord);
     setPokemons(newPokemonList);
   }, [searchWord, initialList]);
+
+  if (!initialList || !pokemons) {
+    return (
+      <Flex
+        align={"center"}
+        justify={"center"}
+        height={"100vh"}
+        width={"100vw"}
+      >
+        <CircularProgress isIndeterminate size={32} color={"gray"}>
+          <CircularProgressLabel fontSize={16} fontWeight="medium">
+            Loading...
+          </CircularProgressLabel>
+        </CircularProgress>
+      </Flex>
+    );
+  }
 
   const contents = pokemons.map((pokemon) => (
     <PokemonSimpleCard pokemon={pokemon} key={pokemon.id} />

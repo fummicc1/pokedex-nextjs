@@ -10,7 +10,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Pokemon[]>
 ) {
-  const limit = 10;
+  const limit = 50;
   const endpoint = `${pokeAPIBaseURL}/pokemon?limit=${limit}`;
   const response = await fetch(endpoint);
   const data: ResponseData = await response.json();
@@ -21,3 +21,9 @@ export default async function handler(
   const results = await Promise.all(pokemons);
   res.status(200).json(results);
 }
+
+export const config = {
+  api: {
+    responseLimit: false,
+  },
+};
