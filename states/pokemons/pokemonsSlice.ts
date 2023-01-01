@@ -11,6 +11,7 @@ export interface PokemonsState {
   listOffset: number;
   isSetuped: boolean;
   isLoading: boolean;
+  shouldLoggedIn: boolean;
   errorMessage: string | null;
 }
 
@@ -22,6 +23,7 @@ const initialState: PokemonsState = {
   listOffset: 0,
   isSetuped: false,
   isLoading: false,
+  shouldLoggedIn: false,
   errorMessage: null,
 };
 
@@ -49,6 +51,9 @@ export const pokemonsSlice = createSlice({
     updateSearchWord: (state, action: PayloadAction<string>) => {
       state.searchWord = action.payload;
     },
+    setShouldLoggedIn: (state) => {
+      state.shouldLoggedIn = true;
+    },
     setFilteredPokemons: (state, action: PayloadAction<Pokemon[]>) => {
       state.filteredPokemons = action.payload;
     },
@@ -67,6 +72,7 @@ export const pokemonsSlice = createSlice({
 export const {
   storePokemonToStorage,
   removePokemonFromStorage,
+  setShouldLoggedIn,
   startLoading,
   increaseOffset,
   setFilteredPokemons,

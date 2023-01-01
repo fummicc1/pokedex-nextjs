@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import { checkIsLoggedIn } from "./accountThunk";
 
 export interface AccountState {
   uid: string | null;
@@ -25,6 +26,11 @@ export const accountSlice = createSlice({
     setUid: (state, action: PayloadAction<string>) => {
       state.uid = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(checkIsLoggedIn.fulfilled, (state, action) => {
+      state.isLoggedIn = action.payload;
+    });
   },
 });
 
