@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import { checkIsLoggedIn } from "./accountThunk";
+import { checkAuthStatus } from "./accountThunk";
 
 export interface AccountState {
   uid: string | null;
@@ -20,19 +20,22 @@ export const accountSlice = createSlice({
   name: "account",
   initialState,
   reducers: {
-    setEmail: (state, action: PayloadAction<string>) => {
+    setIsEmailVerified: (state, action: PayloadAction<boolean>) => {
+      state.isEmailVerified = action.payload;
+    },
+    setEmail: (state, action: PayloadAction<string | null>) => {
       state.email = action.payload;
     },
-    setUid: (state, action: PayloadAction<string>) => {
+    setUid: (state, action: PayloadAction<string | null>) => {
       state.uid = action.payload;
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(checkIsLoggedIn.fulfilled, (state, action) => {
+    builder.addCase(checkAuthStatus.fulfilled, (state, action) => {
       state.isLoggedIn = action.payload;
     });
   },
 });
 
-export const {} = accountSlice.actions;
+export const { setUid, setEmail, setIsEmailVerified } = accountSlice.actions;
 export default accountSlice.reducer;

@@ -15,10 +15,8 @@ import { useState, ChangeEventHandler, useEffect } from "react";
 import {
   finishedSetup,
   increaseOffset,
-  removePokemonFromStorage,
   setFilteredPokemons,
   startLoading,
-  storePokemonToStorage,
   updateSearchWord,
 } from "../../states/pokemons/pokemonsSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -26,28 +24,32 @@ import { Text } from "@chakra-ui/react";
 import { AppDispatch, AppState } from "../../states/store";
 import {
   fetchPokemons,
+  observeUserInfoChange,
   savePokemonID,
 } from "../../states/pokemons/pokemonThunk";
 import { ThunkAction, ThunkDispatch, unwrapResult } from "@reduxjs/toolkit";
 import firebase from "firebase/compat/app";
-import { checkIsLoggedIn } from "../../states/account/accountThunk";
+import { checkAuthStatus } from "../../states/account/accountThunk";
 
 const filterByName = (pokemons: Pokemon[], name: string): Pokemon[] =>
   pokemons.filter((pokemon) => pokemon.name.includes(name));
 
 export default function PokemonListPage() {
-  const state = useSelector((state: AppState) => state.pokemons);
-  const isLoggedIn = useSelector((state: AppState) => state.account.isLoggedIn);
+  const { pokemons: pokemonsState, account: accountState } = useSelector(
+    (state: AppState) => state
+  );
+  const { uid } = accountState;
+  const savedPokemonIDList = pokemonsState.savedPokemonIDList;
   const dispatch = useDispatch<AppDispatch>();
-  const shouldLoggedIn = state.shouldLoggedIn;
-  const offset = state.listOffset;
-  const isLoading = state.isLoading;
+  const shouldLoggedIn = pokemonsState.shouldLoggedIn;
+  const offset = pokemonsState.listOffset;
+  const isLoading = pokemonsState.isLoading;
   const limit = 10;
   const initialMinimumPokemonCount = 90;
-  const isSetuped = state.isSetuped;
-  const fetchedPokemons = state.fetchedPokemons;
-  const filteredPokemons = state.filteredPokemons;
-  const searchWord = state.searchWord;
+  const isSetuped = pokemonsState.isSetuped;
+  const fetchedPokemons = pokemonsState.fetchedPokemons;
+  const filteredPokemons = pokemonsState.filteredPokemons;
+  const searchWord = pokemonsState.searchWord;
 
   useEffect(() => {
     if (searchWord.length === 0) {
@@ -65,7 +67,7 @@ export default function PokemonListPage() {
   }, [offset, dispatch]);
 
   useEffect(() => {
-    dispatch(checkIsLoggedIn());
+    dispatch(checkAuthStatus());
   });
 
   useEffect(() => {
@@ -99,6 +101,13 @@ export default function PokemonListPage() {
     });
   }, []);
 
+  useEffect(() => {
+    // observe change of user info
+    if (uid) {
+      dispatch(observeUserInfoChange(uid));
+    }
+  }, [uid, dispatch]);
+
   const loadingElement = (size: number, fontSize: number) => (
     <CircularProgress isIndeterminate size={size} color={"gray"}>
       <CircularProgressLabel fontSize={fontSize} fontWeight="medium">
@@ -131,7 +140,7 @@ export default function PokemonListPage() {
     </Stack>
   );
 
-  if (!state.isSetuped) {
+  if (!pokemonsState.isSetuped) {
     return (
       <Stack spacing={"2"} padding="2">
         {loginElement}
@@ -150,15 +159,14 @@ export default function PokemonListPage() {
   const contents = filteredPokemons.map((pokemon) => (
     <PokemonSimpleCard
       pokemon={pokemon}
+      isSaved={savedPokemonIDList.includes(pokemon.id)}
       key={pokemon.id}
       onClickSaveButton={(pokemon) => {
-        const isStored = fetchedPokemons
-          .map((pokemon) => pokemon.id)
-          .includes(pokemon.id);
-        if (isStored) {
+        const isStored = savedPokemonIDList.includes(pokemon.id);
+        if (!isStored) {
           dispatch(savePokemonID(pokemon.id));
         } else {
-          dispatch(removePokemonFromStorage(pokemon.id));
+          alert("this feature is not implemented yet.");
         }
       }}
     />

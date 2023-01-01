@@ -14,11 +14,13 @@ import { Pokemon } from "../data/pokemon";
 
 type Props = {
   pokemon: Pokemon;
+  isSaved: boolean;
   onClickSaveButton: (pokemon: Pokemon) => void;
 };
 
 export default function PokemonSimpleCard({
   pokemon,
+  isSaved,
   onClickSaveButton,
 }: Props) {
   const sprites = pokemon.sprites;
@@ -39,7 +41,9 @@ export default function PokemonSimpleCard({
         <Image alt={`image of ${pokemon.name}`} src={imageURL || ""}></Image>
       </CardBody>
       <CardFooter>
-        <Button onClick={() => onClickSaveButton(pokemon)}>Save</Button>
+        <Button onClick={() => onClickSaveButton(pokemon)}>
+          {isSaved ? "Unsave" : "Save"}
+        </Button>
       </CardFooter>
     </Card>
   );

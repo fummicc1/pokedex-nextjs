@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { Pokemon } from "../../data/pokemon";
-import { fetchPokemons } from "./pokemonThunk";
+import { fetchPokemons, savePokemonID } from "./pokemonThunk";
 
 export interface PokemonsState {
   savedPokemonIDList: number[];
@@ -31,13 +31,8 @@ export const pokemonsSlice = createSlice({
   name: "pokemons",
   initialState,
   reducers: {
-    storePokemonToStorage: (state, action: PayloadAction<number>) => {
-      state.savedPokemonIDList.push(action.payload);
-    },
-    removePokemonFromStorage: (state, action: PayloadAction<number>) => {
-      state.savedPokemonIDList = state.savedPokemonIDList.filter(
-        (id) => id != action.payload
-      );
+    setSavedPokemonIDList: (state, action: PayloadAction<number[]>) => {
+      state.savedPokemonIDList = action.payload;
     },
     increaseOffset: (state, action: PayloadAction<number>) => {
       state.listOffset += action.payload;
@@ -66,12 +61,19 @@ export const pokemonsSlice = createSlice({
       state.errorMessage = null;
       state.isLoading = false;
     });
+    builder.addCase(savePokemonID.fulfilled, (state, action) => {
+      const { result, id } = action.payload;
+      if (result && id) {
+        state.savedPokemonIDList.push(id);
+      } else {
+        state.errorMessage = "保存に失敗しました。";
+      }
+    });
   },
 });
 
 export const {
-  storePokemonToStorage,
-  removePokemonFromStorage,
+  setSavedPokemonIDList,
   setShouldLoggedIn,
   startLoading,
   increaseOffset,
