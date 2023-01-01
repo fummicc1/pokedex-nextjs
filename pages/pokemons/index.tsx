@@ -77,7 +77,15 @@ export default function PokemonListPage() {
   }
 
   const contents = pokemons.map((pokemon) => (
-    <PokemonSimpleCard pokemon={pokemon} key={pokemon.id} />
+    <PokemonSimpleCard
+      pokemon={pokemon}
+      key={pokemon.id}
+      onClickSaveButton={(pokemon) => {
+        alert(
+          "Nice action! but please memorize by yourself until save feature is implemented."
+        );
+      }}
+    />
   ));
   const onChangeSearchWord: ChangeEventHandler<HTMLInputElement> = (event) => {
     setSearchWord(event.target.value);
@@ -88,7 +96,7 @@ export default function PokemonListPage() {
         placeholder="Search pokemon by name"
         onChange={onChangeSearchWord}
       ></Input>
-      <SimpleGrid columns={6}>{contents}</SimpleGrid>
+      <SimpleGrid minChildWidth={160}>{contents}</SimpleGrid>
       <Button onClick={() => setOffset(10 + offset)}>
         Load next pokemons...
       </Button>

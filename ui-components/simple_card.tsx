@@ -14,9 +14,13 @@ import { Pokemon } from "../data/pokemon";
 
 type Props = {
   pokemon: Pokemon;
+  onClickSaveButton: (pokemon: Pokemon) => void;
 };
 
-export default function PokemonSimpleCard({ pokemon }: Props) {
+export default function PokemonSimpleCard({
+  pokemon,
+  onClickSaveButton,
+}: Props) {
   const sprites = pokemon.sprites;
   let imageURL;
   if (!sprites) {
@@ -35,7 +39,7 @@ export default function PokemonSimpleCard({ pokemon }: Props) {
         <Image alt={`image of ${pokemon.name}`} src={imageURL || ""}></Image>
       </CardBody>
       <CardFooter>
-        <Button>Save</Button>
+        <Button onClick={() => onClickSaveButton(pokemon)}>Save</Button>
       </CardFooter>
     </Card>
   );
