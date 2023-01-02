@@ -1,5 +1,4 @@
 import { Pokemon, PokemonPartialInfo } from "../../data/pokemon";
-import useSWR, { Fetcher } from "swr";
 import PokemonSimpleCard from "../../ui-components/simple_card";
 import {
   Box,
@@ -11,7 +10,7 @@ import {
   SimpleGrid,
   Stack,
 } from "@chakra-ui/react";
-import { useState, ChangeEventHandler, useEffect } from "react";
+import { useEffect } from "react";
 import {
   finishedSetup,
   increaseOffset,
@@ -27,7 +26,6 @@ import {
   observeUserInfoChange,
   savePokemonID,
 } from "../../states/pokemons/pokemonThunk";
-import { ThunkAction, ThunkDispatch, unwrapResult } from "@reduxjs/toolkit";
 import firebase from "firebase/compat/app";
 import { checkAuthStatus } from "../../states/account/accountThunk";
 
