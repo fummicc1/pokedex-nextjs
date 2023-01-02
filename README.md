@@ -10,4 +10,4 @@ The goal of this project is for me to understand Next.js and other related skill
 
 ## Demo
 
-- WIP
+![Screen Recording 2023-01-01 at 18 39 21](https://user-images.githubusercontent.com/44002126/210166595-0e393643-71db-457d-9e89-711f157194f0.gif)
