@@ -174,10 +174,13 @@ export default function PokemonListPage() {
   return (
     <Stack spacing={"2"} padding="2">
       {loginElement}
-      <Input
-        placeholder="Search pokemon by name"
-        onChange={(event) => dispatch(updateSearchWord(event.target.value))}
-      ></Input>
+
+      <Box top={0} position="sticky" zIndex={"sticky"} bgColor="Background">
+        <Input
+          placeholder="Search pokemon by name"
+          onChange={(event) => dispatch(updateSearchWord(event.target.value))}
+        ></Input>
+      </Box>
       <SimpleGrid minChildWidth={160}>{contents}</SimpleGrid>
       <Button onClick={() => dispatch(increaseOffset(10))}>
         Load next pokemons...
